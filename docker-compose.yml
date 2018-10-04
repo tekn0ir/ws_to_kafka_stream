@@ -1,0 +1,59 @@
+version: '3.7'
+
+services:
+  kafka:
+    container_name: kafka
+    image: spotify/kafka
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+    environment:
+       ADVERTISED_HOST: kafka
+       ADVERTISED_PORT: 9092
+
+#  websocketstream:
+#    container_name: websocketstream
+#    build:
+#      context: ./websocketstream
+#      dockerfile: Dockerfile
+#    logging:
+#      driver: none
+#    depends_on:
+#      - kafka
+#      - testproducer
+#    links:
+#      - kafka:kafka
+#      - testproducer:testproducer
+
+#  testproducer:
+#    container_name: testproducer
+#    build:
+#      context: ./testproducer
+#      dockerfile: Dockerfile
+#    logging:
+#      driver: none
+
+  poloniexstream:
+    container_name: poloniexstream
+    build:
+      context: ./poloniexstream
+      dockerfile: Dockerfile
+    logging:
+      driver: none
+    depends_on:
+      - kafka
+    links:
+      - kafka:kafka
+
+  kafkacat:
+    container_name: kafkacat
+    image: confluentinc/cp-kafkacat
+    command: >
+      /bin/bash -c "
+        sleep 15;
+        kafkacat -b kafka:9092 -C -t poloniex;
+      "
+    depends_on:
+      - kafka
+    links:
+      - kafka:kafka
