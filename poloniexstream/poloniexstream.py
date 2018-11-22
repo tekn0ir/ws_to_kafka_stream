@@ -40,7 +40,7 @@ channels = {
     'USDT_QTUM': 223
 }
 
-async def receive_websocket(): #topic):
+async def receive_websocket():
     session = aiohttp.ClientSession()
     async with session.ws_connect(URL) as ws:
         for channel, id in channels.items():
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             app.finalize()
 
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(receive_websocket()) #topic))
+            loop.run_until_complete(receive_websocket())
             loop.run_forever()
 
         except:

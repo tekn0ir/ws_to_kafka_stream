@@ -38,6 +38,7 @@ services:
     build:
       context: ./poloniexstream
       dockerfile: Dockerfile
+    restart: unless-stopped
     logging:
       driver: none
     depends_on:
@@ -45,15 +46,53 @@ services:
     links:
       - kafka:kafka
 
-  kafkacat:
-    container_name: kafkacat
-    image: confluentinc/cp-kafkacat
-    command: >
-      /bin/bash -c "
-        sleep 15;
-        kafkacat -b kafka:9092 -C -t poloniex;
-      "
+#  kafkacat:
+#    container_name: kafkacat
+#    image: confluentinc/cp-kafkacat
+#    command: >
+#      /bin/bash -c "
+#        sleep 15;
+#        kafkacat -b kafka:9092 -C -t poloniex;
+#      "
+#    depends_on:
+#      - kafka
+#    links:
+#      - kafka:kafka
+
+#  mongo:
+#    image: mongo
+#    restart: always
+#    command: --smallfiles
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: example
+#
+#  mongo-express:
+#    image: mongo-express
+#    restart: always
+#    ports:
+#    - 8081:8081
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#    depends_on:
+#    - mongo
+#    links:
+#    - mongo:mongo
+
+  kafkamongodbstream:
+    container_name: kafkamongodbstream
+    build:
+      context: ./kafkamongodbstream
+      dockerfile: Dockerfile
+    environment:
+      TOPIC: poloniex
+    restart: unless-stopped
+#    logging:
+#      driver: none
     depends_on:
-      - kafka
+    - kafka
+#    - mongo
     links:
-      - kafka:kafka
+    - kafka:kafka
+#    - mongo:mongo
